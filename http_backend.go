@@ -100,6 +100,7 @@ func (h *httpBackend) Init(jar http.CookieJar) {
 
 	retryClient := retryablehttp.NewClient()
 	retryClient.RetryMax = 1
+	retryClient.Logger = nil // do not log
 	retryClient.ErrorHandler = retryablehttp.PassthroughErrorHandler
 	stdClient := retryClient.StandardClient()
 
@@ -111,14 +112,6 @@ func (h *httpBackend) Init(jar http.CookieJar) {
 	h.lock = &sync.RWMutex{}
 }
 
-/*
-	retryClient := retryablehttp.NewClient()
-	retryClient.RetryMax = 0
-	retryClient.ErrorHandler = retryablehttp.PassthroughErrorHandler
-
-	standardClient := retryClient.StandardClient() // *http.Client
-	standardClient.Jar = jar
-*/
 // Match checks that the domain parameter triggers the rule
 func (r *LimitRule) Match(domain string) bool {
 	match := false
