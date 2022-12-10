@@ -1,4 +1,4 @@
-module github.com/gocolly/colly
+module github.com/horahoradev/colly
 
 go 1.12
 
