@@ -99,7 +99,7 @@ func (h *httpBackend) Init(jar http.CookieJar) {
 	rand.Seed(time.Now().UnixNano())
 
 	retryClient := retryablehttp.NewClient()
-	retryClient.RetryMax = 1
+	retryClient.RetryMax = 3
 	retryClient.Logger = nil // do not log
 	retryClient.ErrorHandler = retryablehttp.PassthroughErrorHandler
 	stdClient := retryClient.StandardClient()
