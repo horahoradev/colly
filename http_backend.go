@@ -32,6 +32,7 @@ import (
 	"compress/gzip"
 
 	"github.com/gobwas/glob"
+	"github.com/hashicorp/go-retryablehttp"
 )
 
 type httpBackend struct {
@@ -96,13 +97,28 @@ func (r *LimitRule) Init() error {
 
 func (h *httpBackend) Init(jar http.CookieJar) {
 	rand.Seed(time.Now().UnixNano())
+
+	retryClient := retryablehttp.NewClient()
+	retryClient.RetryMax = 1
+	retryClient.ErrorHandler = retryablehttp.PassthroughErrorHandler
+	stdClient := retryClient.StandardClient()
+
 	h.Client = &http.Client{
-		Jar:     jar,
-		Timeout: 10 * time.Second,
+		Jar:       jar,
+		Timeout:   10 * time.Second,
+		Transport: stdClient.Transport,
 	}
 	h.lock = &sync.RWMutex{}
 }
 
+/*
+	retryClient := retryablehttp.NewClient()
+	retryClient.RetryMax = 0
+	retryClient.ErrorHandler = retryablehttp.PassthroughErrorHandler
+
+	standardClient := retryClient.StandardClient() // *http.Client
+	standardClient.Jar = jar
+*/
 // Match checks that the domain parameter triggers the rule
 func (r *LimitRule) Match(domain string) bool {
 	match := false
